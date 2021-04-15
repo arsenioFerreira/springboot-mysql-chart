@@ -34,7 +34,7 @@ spec:
               protocol: TCP
           env:
           - name: DB_URL
-            value: "jdbc:mysql://test-mysql-headless:3306/virtualmind"
+            value: "jdbc:mysql://default-demo-hr-mysql-headless:3306/virtualmind"
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
