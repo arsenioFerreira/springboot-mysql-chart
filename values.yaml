@@ -1,0 +1,145 @@
+# Default values for springboot-mysql-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: darkarse/spring-docker-gradle
+  pullPolicy: IfNotPresent
+  tag: 15042021T060606
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: LoadBalancer
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+      - path: /
+        backend:
+          serviceName: chart-example.local
+          servicePort: 80
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+mysql:
+  auth:
+    database: virtualmind
+    rootPassword: virtualmind
+  primary:
+    persistence:
+      enabled: false
+    extraEnvVars:
+    - name: MYSQL_ROOT_USER
+      value: "virtualmind"
+  initdbScripts:
+    init.sql: |
+      CREATE TABLE `topic` (
+        `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+        `name` varchar(255) NOT NULL,
+        PRIMARY KEY (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      CREATE TABLE `post` (
+          `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+          `topic_id` int(11) unsigned NOT NULL,
+          `title` TEXT NOT NULL,
+          `text` TEXT NOT NULL,
+        PRIMARY KEY (`id`),
+        KEY `topic_id` (`topic_id`),
+        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`topic_id`) REFERENCES `topic` (`id`)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+      insert into topic (name) values ("b-topic"), ("c-topic"), ("l-topic"),
+      ("d-topic"), ("h-topic"), ("f-topic"), ("e-topic"), ("a-topic"),
+      ("j-topic"), ("k-topic"), ("i-topic"), ("g-topic");
+
+      insert into post (topic_id, title, text) values
+      ((select id from topic where name = 'a-topic'), 'post-1-a', 'post-1-a'),
+
+      ((select id from topic where name = 'b-topic'), 'post-1-b', 'post-1-b'),
+      ((select id from topic where name = 'b-topic'), 'post-2-b', 'post-2-b'),
+      ((select id from topic where name = 'b-topic'), 'post-3-b', 'post-3-b'),
+      ((select id from topic where name = 'b-topic'), 'post-4-b', 'post-4-b'),
+      ((select id from topic where name = 'b-topic'), 'post-5-b', 'post-5-b'),
+      ((select id from topic where name = 'b-topic'), 'post-6-b', 'post-6-b'),
+
+      ((select id from topic where name = 'c-topic'), 'post-1', 'post-1'),
+
+      ((select id from topic where name = 'd-topic'), 'post-1', 'post-1'),
+
+      ((select id from topic where name = 'e-topic'), 'post-1-e', 'post-1-e'),
+      ((select id from topic where name = 'e-topic'), 'post-2-e', 'post-2-e'),
+      ((select id from topic where name = 'e-topic'), 'post-3-e', 'post-3-e'),
+      ((select id from topic where name = 'e-topic'), 'post-4-e', 'post-4-e'),
+      ((select id from topic where name = 'e-topic'), 'post-5-e', 'post-5-e'),
+      ((select id from topic where name = 'e-topic'), 'post-6-e', 'post-6-e'),
+
+      ((select id from topic where name = 'f-topic'), 'post-1-f', 'post-1-f'),
+
+      ((select id from topic where name = 'g-topic'), 'post-1-g', 'post-1-g'),
+
+      ((select id from topic where name = 'h-topic'), 'post-1-h', 'post-1-h'),
+
+      ((select id from topic where name = 'i-topic'), 'post-1-i', 'post-1-i'),
+
+      ((select id from topic where name = 'j-topic'), 'post-1-j', 'post-1-j');
